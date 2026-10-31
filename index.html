@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SaveStep</title>
+<style>
+:root{--navy:#14284B;--green:#2E9E5B;--bg:#F7F5EF;--text:#111;--warn:#E8710A;--red:#C62828;--line:#DDD8CB;--card:#fff;--mute:#5b6170}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 "Avenir Next","Segoe UI",system-ui,sans-serif;padding-bottom:84px}
+header{background:var(--navy);color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:1.25rem;letter-spacing:.2px}
+.lang button{background:none;border:1px solid #fff8;color:#fff;padding:4px 10px;cursor:pointer;font:inherit;font-size:.85rem}
+.lang button:first-child{border-radius:6px 0 0 6px}.lang button:last-child{border-radius:0 6px 6px 0;border-left:0}
+.lang button.on{background:#fff;color:var(--navy);font-weight:700}
+main{max-width:640px;margin:0 auto;padding:18px}
+h2{font-size:1.35rem;margin:0 0 4px;color:var(--navy)}
+h3{font-size:1.05rem;margin:22px 0 8px;color:var(--navy)}
+p{margin:6px 0}.mute{color:var(--mute);font-size:.92rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:12px 0}
+.big{font-size:2.4rem;font-weight:800;color:var(--navy);line-height:1.1}
+.bar{height:16px;background:#E6E2D6;border-radius:99px;overflow:hidden;margin:10px 0}
+.fill{height:100%;background:var(--green);border-radius:99px;transition:width .5s}
+.fill.over{background:var(--red)}
+label{display:block;font-weight:600;margin:12px 0 4px}
+input,select{width:100%;padding:11px;border:1px solid #bdb8a8;border-radius:8px;font:inherit;background:#fff;color:var(--text)}
+input:focus,button:focus-visible,select:focus{outline:3px solid #7d9ad1;outline-offset:1px}
+.btn{background:var(--navy);color:#fff;border:0;border-radius:8px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer;margin-top:14px;width:100%}
+.btn.small{width:auto;padding:6px 12px;margin:0;font-size:.85rem}
+.btn.ghost{background:none;color:var(--navy);border:1px solid var(--navy)}
+.link{background:none;border:0;color:var(--red);cursor:pointer;font:inherit;font-size:.85rem;padding:4px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.win{background:var(--green);color:#fff;border-radius:12px;padding:16px;margin:12px 0;font-weight:700}
+.win span{display:block;font-weight:400;margin-top:4px}
+.warn{background:#FDE9D6;border-left:5px solid var(--warn);padding:10px 12px;border-radius:6px;margin:12px 0}
+.warn.red{background:#FBE0E0;border-color:var(--red)}
+.seg{display:flex;height:22px;border-radius:99px;overflow:hidden;background:#E6E2D6;margin:10px 0}
+.seg i{display:block;height:100%}
+.key{display:flex;gap:14px;flex-wrap:wrap;font-size:.9rem}
+.key b{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.months{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.m{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px;font-size:.85rem}
+.m b{display:block;color:var(--navy)}
+.m.done{background:var(--green);color:#fff;border-color:var(--green)}.m.done b{color:#fff}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:2px solid var(--navy);display:flex;z-index:6}
+nav button{flex:1;background:none;border:0;padding:9px 2px 7px;font:inherit;font-size:.78rem;color:var(--mute);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button.on{color:#fff;background:var(--navy);font-weight:700}
+svg.ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+details summary{cursor:pointer;font-weight:700;color:var(--navy)}
+@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+</style>
+</head>
+<body>
+<header><h1>SaveStep</h1><div class="lang"><button id="en" onclick="setLang('en')">EN</button><button id="es" onclick="setLang('es')">ES</button></div></header>
+<main id="app"></main>
+<nav id="nav"></nav>
+<script>
+const T={en:{home:"Goals",track:"Savings",budget:"Budget",cal:"Calendar",
+qTitle:"Let's make your first savings plan",qSub:"Answer three quick questions.",q1:"What are you saving for?",q1p:"House, car, trip…",q2:"How much does it cost?",q3:"How much can you save each month?",seePlan:"See my plan",
+planTitle:"Your first plan",planLine:(m,d)=>`Save this amount every month and you'll reach your goal in ${m} ${m==1?'month':'months'}, by ${d}.`,
+saved:"saved",of:"of",left:"left to go",reached:"Goal reached!",reachedMsg:n=>`You saved the full amount for "${n}". Time to celebrate.`,
+eta:"Estimated finish",none:"Set a monthly amount to see a finish date.",months:"months",
+addGoal:"Add a goal",name:"Goal name",target:"Target amount",s0:"Already saved",monthly:"Monthly saving",saveGoal:"Save goal",
+yourGoals:"Your goals",del:"Delete",pick:"View",
+addDep:"Add savings",amount:"Amount",date:"Date",add:"Add",history:"Savings history",noDeps:"No savings added yet.",forGoal:"For goal",
+income:"Monthly income",needs:"Needs (what you must spend)",needName:"Rent, food, bills…",save:"Savings (goal contributions)",leftover:"Left over",
+overMsg:a=>`You are overspending by ${a} per month. Lower your needs or your monthly savings.`,
+tightMsg:"Almost nothing left over. Watch your spending.",enterIncome:"Enter your monthly income to see your budget.",
+calTitle:"Savings calendar",calLine:(m,d)=>`${m} ${m==1?'month':'months'} to go. Goal date: ${d}.`,calDone:"This goal is already complete.",noGoal:"Create a goal first.",total:"Total"},
+es:{home:"Metas",track:"Ahorros",budget:"Presupuesto",cal:"Calendario",
+qTitle:"Creemos tu primer plan de ahorro",qSub:"Responde tres preguntas rápidas.",q1:"¿Para qué estás ahorrando?",q1p:"Casa, carro, viaje…",q2:"¿Cuánto cuesta?",q3:"¿Cuánto puedes ahorrar al mes?",seePlan:"Ver mi plan",
+planTitle:"Tu primer plan",planLine:(m,d)=>`Ahorra esta cantidad cada mes y alcanzarás tu meta en ${m} ${m==1?'mes':'meses'}, para ${d}.`,
+saved:"ahorrado",of:"de",left:"por ahorrar",reached:"¡Meta alcanzada!",reachedMsg:n=>`Ahorraste el monto completo para "${n}". Hora de celebrar.`,
+eta:"Fecha estimada",none:"Define un ahorro mensual para ver la fecha.",months:"meses",
+addGoal:"Agregar una meta",name:"Nombre de la meta",target:"Monto objetivo",s0:"Ya ahorrado",monthly:"Ahorro mensual",saveGoal:"Guardar meta",
+yourGoals:"Tus metas",del:"Eliminar",pick:"Ver",
+addDep:"Agregar ahorro",amount:"Monto",date:"Fecha",add:"Agregar",history:"Historial de ahorros",noDeps:"Aún no has agregado ahorros.",forGoal:"Para la meta",
+income:"Ingreso mensual",needs:"Necesidades (gastos obligatorios)",needName:"Renta, comida, cuentas…",save:"Ahorros (aportes a metas)",leftover:"Te sobra",
+overMsg:a=>`Estás gastando ${a} de más al mes. Reduce tus necesidades o tu ahorro mensual.`,
+tightMsg:"Casi no te sobra nada. Cuida tus gastos.",enterIncome:"Ingresa tu ingreso mensual para ver tu presupuesto.",
+calTitle:"Calendario de ahorro",calLine:(m,d)=>`Faltan ${m} ${m==1?'mes':'meses'}. Fecha de la meta: ${d}.`,calDone:"Esta meta ya está completa.",noGoal:"Primero crea una meta.",total:"Total"}};
+
+const ICON={goals:'<path d="M3 11l9-8 9 8M5 10v10h14V10"/>',track:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',budget:'<path d="M5 20V10M12 20V4M19 20v-7"/>',cal:'<path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"/>'};
+const ic=k=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICON[k]}</svg>`;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+let S=load();
+function load(){try{const d=JSON.parse(localStorage.getItem('savestep'));if(d&&d.goals)return d}catch(e){}
+ return{lang:(navigator.language||'en').startsWith('es')?'es':'en',goals:[],active:null,deps:[],income:0,needs:[],tab:'home',plan:null}}
+function save(){try{localStorage.setItem('savestep',JSON.stringify(S))}catch(e){}}
+const t=k=>(T[S.lang][k]!==undefined?T[S.lang][k]:T.en[k]);
+const loc=()=>S.lang==='es'?'es-US':'en-US';
+const money=n=>new Intl.NumberFormat(loc(),{style:'currency',currency:'USD',minimumFractionDigits:0,maximumFractionDigits:2}).format(n||0);
+const monthName=d=>d.toLocaleDateString(loc(),{month:'short',year:'numeric'});
+const num=v=>Math.max(0,parseFloat(v)||0);
+const cur=()=>S.goals.find(g=>g.id===S.active)||S.goals[0];
+const savedOf=g=>g.s0+S.deps.filter(d=>d.g===g.id).reduce((a,d)=>a+d.a,0);
+const monthsOf=g=>{const r=g.target-savedOf(g);if(r<=0)return 0;return g.m>0?Math.ceil(r/g.m):null};
+const addMonths=n=>{const d=new Date();d.setDate(1);d.setMonth(d.getMonth()+n);return d};
+
+function setLang(l){S.lang=l;document.documentElement.lang=l;save();render()}
+function go(tab){S.tab=tab;save();render();window.scrollTo(0,0)}
+
+function bar(p,over){const v=Math.min(100,Math.round(p));return `<div class="bar" role="progressbar" aria-valuenow="${v}" aria-valuemin="0" aria-valuemax="100"><div class="fill${over?' over':''}" style="width:${v}%"></div></div>`}
+
+function goalForm(short){
+ return `<form onsubmit="submitGoal(event,${short})">
+ <label for="gn">${short?t('q1'):t('name')}</label><input id="gn" required maxlength="40" placeholder="${short?t('q1p'):''}">
+ <label for="gt">${short?t('q2'):t('target')}</label><input id="gt" type="number" min="1" step="any" inputmode="decimal" required>
+ ${short?'':`<label for="gs">${t('s0')}</label><input id="gs" type="number" min="0" step="any" inputmode="decimal" value="0">`}
+ <label for="gm">${short?t('q3'):t('monthly')}</label><input id="gm" type="number" min="1" step="any" inputmode="decimal" required>
+ <button class="btn">${short?t('seePlan'):t('saveGoal')}</button></form>`}
+
+function submitGoal(e,short){e.preventDefault();
+ const g={id:Date.now(),name:$('gn').value.trim(),target:num($('gt').value),m:num($('gm').value),s0:short?0:num($('gs').value)};
+ S.goals.push(g);S.active=g.id;
+ if(short){S.plan=g.id;S.tab='home'}else S.tab='home';
+ save();render();window.scrollTo(0,0)}
+const $=id=>document.getElementById(id);
+
+function viewStart(){
+ return `<h2>${t('qTitle')}</h2><p class="mute">${t('qSub')}</p><div class="card">${goalForm(true)}</div>`}
+
+function viewHome(){
+ const g=cur(),s=savedOf(g),p=g.target?s/g.target*100:0,m=monthsOf(g);
+ let h='';
+ if(S.plan===g.id&&m){h+=`<div class="card"><b>${t('planTitle')}</b><p>${t('planLine')(m,monthName(addMonths(m)))}</p></div>`}
+ if(s>=g.target)h+=`<div class="win">${t('reached')}<span>${t('reachedMsg')(esc(g.name))}</span></div>`;
+ h+=`<div class="card"><h2>${esc(g.name)}</h2><div class="big">${Math.floor(p)}%</div>${bar(p)}
+ <p><b>${money(s)}</b> ${t('saved')} ${t('of')} ${money(g.target)}</p>
+ <p class="mute">${money(Math.max(0,g.target-s))} ${t('left')}</p>
+ <p class="mute">${t('eta')}: ${m===0?'✓':m===null?t('none'):monthName(addMonths(m))}</p></div>`;
+ h+=`<h3>${t('yourGoals')}</h3><div class="card">`+S.goals.map(x=>{const q=x.target?savedOf(x)/x.target*100:0;
+  return `<div class="row"><div style="flex:1"><b>${esc(x.name)}</b>${x.id===g.id?' ✓':''}<div class="mute">${money(savedOf(x))} ${t('of')} ${money(x.target)}</div>${bar(q)}</div>
+  <div><button class="btn small ghost" onclick="pickGoal(${x.id})">${t('pick')}</button><button class="link" onclick="delGoal(${x.id})">${t('del')}</button></div></div>`}).join('')+`</div>`;
+ h+=`<details class="card"><summary>${t('addGoal')}</summary>${goalForm(false)}</details>`;
+ return h}
+function pickGoal(id){S.active=id;S.plan=null;save();render()}
+function delGoal(id){S.goals=S.goals.filter(g=>g.id!==id);S.deps=S.deps.filter(d=>d.g!==id);if(S.active===id)S.active=S.goals[0]?S.goals[0].id:null;save();render()}
+
+function viewTrack(){
+ const g=cur(),list=S.deps.filter(d=>d.g===g.id).sort((a,b)=>b.d.localeCompare(a.d));
+ const today=new Date().toISOString().slice(0,10);
+ return `<h2>${t('addDep')}</h2>
+ <div class="card"><form onsubmit="addDep(event)">
+ <label for="dg">${t('forGoal')}</label><select id="dg" onchange="pickGoal(+this.value)">${S.goals.map(x=>`<option value="${x.id}"${x.id===g.id?' selected':''}>${esc(x.name)}</option>`).join('')}</select>
+ <div class="grid2"><div><label for="da">${t('amount')}</label><input id="da" type="number" min="0.01" step="any" inputmode="decimal" required></div>
+ <div><label for="dd">${t('date')}</label><input id="dd" type="date" value="${today}" required></div></div>
+ <button class="btn">${t('add')}</button></form></div>
+ <div class="card"><b>${money(savedOf(g))}</b> ${t('of')} ${money(g.target)}${bar(g.target?savedOf(g)/g.target*100:0)}</div>
+ <h3>${t('history')}</h3><div class="card">`+(list.length?list.map(d=>`<div class="row"><span>${new Date(d.d+'T00:00').toLocaleDateString(loc(),{dateStyle:'medium'})}</span><b>${money(d.a)}</b><button class="link" onclick="delDep(${d.id})">${t('del')}</button></div>`).join(''):`<p class="mute">${t('noDeps')}</p>`)+`</div>`}
+function addDep(e){e.preventDefault();const a=num($('da').value);if(!a)return;S.deps.push({id:Date.now(),g:cur().id,a,d:$('dd').value});save();render()}
+function delDep(id){S.deps=S.deps.filter(d=>d.id!==id);save();render()}
+
+function viewBudget(){
+ const inc=S.income,needs=S.needs.reduce((a,n)=>a+n.a,0),sav=S.goals.filter(g=>savedOf(g)<g.target).reduce((a,g)=>a+g.m,0),left=inc-needs-sav;
+ let h=`<h2>${t('budget')}</h2><div class="card"><label for="inc">${t('income')}</label><input id="inc" type="number" min="0" step="any" inputmode="decimal" value="${inc||''}" onchange="S.income=num(this.value);save();render()"></div>`;
+ if(!inc){return h+`<p class="mute">${t('enterIncome')}</p>`+needsBlock()}
+ const over=left<0,pn=needs/inc*100,ps=sav/inc*100,pl=Math.max(0,left/inc*100);
+ if(over)h+=`<div class="warn red"><b>!</b> ${t('overMsg')(money(-left))}</div>`;
+ else if(left/inc<0.05)h+=`<div class="warn"><b>!</b> ${t('tightMsg')}</div>`;
+ const sc=over?100/(pn+ps):1;
+ h+=`<div class="card"><div class="seg"><i style="width:${pn*sc}%;background:var(--navy)"></i><i style="width:${ps*sc}%;background:var(--green)"></i><i style="width:${pl}%;background:#9aa3b5"></i></div>
+ <div class="key"><span><b style="background:var(--navy)"></b>${t('needs').split(' (')[0]} ${money(needs)}</span><span><b style="background:var(--green)"></b>${t('save').split(' (')[0]} ${money(sav)}</span><span><b style="background:#9aa3b5"></b>${t('leftover')} <span style="color:${over?'var(--red)':'inherit'};font-weight:700">${money(left)}</span></span></div></div>`;
+ return h+needsBlock()}
+function needsBlock(){
+ return `<h3>${t('needs')}</h3><div class="card">`+S.needs.map(n=>`<div class="row"><span>${esc(n.n)}</span><b>${money(n.a)}</b><button class="link" onclick="delNeed(${n.id})">${t('del')}</button></div>`).join('')+
+ `<form onsubmit="addNeed(event)"><div class="grid2"><div><label for="nn">${t('name')}</label><input id="nn" required maxlength="30" placeholder="${t('needName')}"></div><div><label for="na">${t('amount')}</label><input id="na" type="number" min="0.01" step="any" inputmode="decimal" required></div></div><button class="btn">${t('add')}</button></form></div>`}
+function addNeed(e){e.preventDefault();S.needs.push({id:Date.now(),n:$('nn').value.trim(),a:num($('na').value)});save();render()}
+function delNeed(id){S.needs=S.needs.filter(n=>n.id!==id);save();render()}
+
+function viewCal(){
+ const g=cur(),m=monthsOf(g);
+ let h=`<h2>${t('calTitle')}</h2><div class="card"><b>${esc(g.name)}</b>`;
+ if(m===0)h+=`<p>${t('calDone')}</p></div>`;
+ else if(m===null)h+=`<p>${t('none')}</p></div>`;
+ else{h+=`<p>${t('calLine')(m,monthName(addMonths(m)))}</p>${bar(savedOf(g)/g.target*100)}</div><div class="months">`;
+  const shown=Math.min(m,36);let tot=savedOf(g);
+  for(let i=1;i<=shown;i++){tot=Math.min(g.target,savedOf(g)+g.m*i);if(i===m)tot=g.target;
+   h+=`<div class="m${i===m?' done':''}"><b>${monthName(addMonths(i))}</b>${money(tot)}${i===m?' ✓':''}</div>`}
+  h+=`</div>`+(m>shown?`<p class="mute">… +${m-shown} ${t('months')}</p>`:'')}
+ return h}
+
+function render(){
+ $('en').className=S.lang==='en'?'on':'';$('es').className=S.lang==='es'?'on':'';
+ const nav=$('nav'),app=$('app');
+ if(!S.goals.length){nav.innerHTML='';app.innerHTML=viewStart();return}
+ const tabs=[['home','goals','home'],['track','track','track'],['budget','budget','budget'],['cal','cal','cal']];
+ nav.innerHTML=tabs.map(x=>`<button class="${S.tab===x[0]?'on':''}" onclick="go('${x[0]}')" aria-label="${t(x[2])}">${ic(x[1])}${t(x[2])}</button>`).join('');
+ app.innerHTML={home:viewHome,track:viewTrack,budget:viewBudget,cal:viewCal}[S.tab]();
+}
+document.documentElement.lang=S.lang;render();
+</script>
+</body>
+</html>
